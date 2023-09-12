@@ -26,7 +26,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             // TODO put this in appsettings
-            policy.WithOrigins("https://localhost:41122").AllowAnyMethod().AllowAnyHeader();
+            policy.WithOrigins("https://localhost:42200").AllowAnyMethod().AllowAnyHeader();
         }
     )
 );
