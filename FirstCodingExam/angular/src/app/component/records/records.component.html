@@ -1,0 +1,220 @@
+<div class="container-fluid">
+    <h1>Interest Calculator</h1>
+    <div class="form">
+        <div class="row">
+            <div class="col-3">
+              <div class="alert alert-danger" *ngIf="hasError" role="alert">
+                  There are inputs that are not numbers
+              </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="#AmountInput"
+                        class="{{newRecord.amount == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                        Present Value</label>
+                        <input class="form-control"
+                        [(ngModel)]="newRecord.amount" type="text" 
+                        placeholder="+ Present Value" 
+                        #AmountInput required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="#lowerBoundInterestRateInput"
+                        class="{{newRecord.lowerBoundInterestRate == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                        Lower Bound Interest Rate</label>
+                        <input class="form-control"
+                        [(ngModel)]="newRecord.lowerBoundInterestRate" type="text" 
+                        placeholder="+ Lower Bound Interest Rate" 
+                        #lowerBoundInterestRateInput required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="#upperBoundInterestRateInput"
+                        class="{{newRecord.upperBoundInterestRate == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                        Upper Bound Interest Rate</label>
+                        <input class="form-control"
+                        [(ngModel)]="newRecord.upperBoundInterestRate" type="text" 
+                        placeholder="+ Upper Bound Interest Rate" 
+                        #upperBoundInterestRateInput required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="#incrementalRateInput"
+                        class="{{newRecord.incrementalRate == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                        Incremental Rate</label>
+                        <input class="form-control"
+                        [(ngModel)]="newRecord.incrementalRate" type="text" 
+                        placeholder="+ Incremental Rate" 
+                        #incrementalRateInput required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="#maturityYearsInput"
+                        class="{{newRecord.maturityYears == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                        Maturity Year/s</label>
+                        <input class="form-control"
+                        [(ngModel)]="newRecord.maturityYears" type="text" 
+                        placeholder="+ Maturity Year/s" 
+                        #maturityYearsInput required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3 offset-md-3">
+                      <button type="button" class="btn btn-outline-success" (click)="saveNewRecord()">Calculate</button>
+                    </div>
+                </div>
+                <div class="legends position-absolute bottom-0 start-0 translate-middle">
+                    <div class="row">
+                        <div class="col-2">Legends</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">LBIR</div>
+                        <div class="col-1">=</div>
+                        <div class="col-9">Lower Bound Interest Rate</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">UBIR</div>
+                        <div class="col-1">=</div>
+                        <div class="col-9">Upper Bound Interest Rate</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2">IR</div>
+                        <div class="col-1">=</div>
+                        <div class="col-9">Incremental Rate</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9 records-body">
+                <div class="row">
+                    <div class="col-1 id-label">ID</div>
+                    <div class="col-2 amount-label">Amount</div>
+                    <div class="col-1">LBIR</div>
+                    <div class="col-1">UBIR</div>
+                    <div class="col-1">IR</div>
+                    <div class="col-1">Years</div>
+                    <div class="col-5">Date</div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                      <!-- Record Accordion -->
+                        <div class="accordion accordion-borderless" id="accordionFlush">
+                          <ng-container *ngFor="let record of records">
+                            <div class="accordion-item">
+                              <h2 class="accordion-header" attr.id="flush-heading-record-{{record.id}}">
+                                <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse"
+                                attr.data-mdb-target="#flush-collapse-record-{{record.id}}" aria-expanded="false" attr.aria-controls="flush-collapse-record-{{record.id}}">
+                                  <!-- Current Record -->
+                                  <div class="col-1">{{record.id}}</div>
+                                  <div class="col-2">{{record.amount | number : '1.2-2'}}</div> 
+                                  <div class="col-1">{{record.lowerBoundInterestRate}}</div>
+                                  <div class="col-1">{{record.upperBoundInterestRate}}</div> 
+                                  <div class="col-1">{{record.incrementalRate}}</div> 
+                                  <div class="col-1 year-value">{{record.maturityYears}}</div> 
+                                  <div class="col-5 items-alignment">{{record.dateCreated | date:'shortDate'}}</div>
+                                </button>
+                              </h2>
+                              <div attr.id="flush-collapse-record-{{record.id}}" class="accordion-collapse collapse" attr.attr.aria-labelledby="flush-heading-record-{{record.id}}"
+                                data-mdb-parent="#accordionFlush">
+                                <div class="accordion-body card">
+                                  <!-- Current Calculations -->
+                                  <div class="row">
+                                    <div class="col-12">
+                                      <div class="row">
+                                        <div class="col-4 offset-md-8">
+                                          <button type="button" class="btn btn-outline-primary edit-button" (click)="edit(record.id)"><i class="fa-regular fa-pen-to-square fa-2xl"></i></button>
+                                          <button type="button" class="btn btn-outline-danger delete-button" (click)="deleteRecord(record.id)"><i class="fa-sharp fa-solid fa-trash-can fa-2xl"></i></button>
+                                        </div>
+                                      </div>
+                                      <h6 class="pt-1">Calculations</h6>
+                                      <div class="row pb-1">
+                                        <div class="col-2">Year</div>
+                                        <div class="col-2">Amount</div>
+                                        <div class="col-2">Future Amount</div> 
+                                        <div class="col-2">IR</div> 
+                                        <div class="col-4">Date</div>
+                                      </div>
+                                      <ng-container *ngFor="let calculations of record.calculatedRecords">
+                                        <div class="row">
+                                          <div class="col-2">{{calculations.years}}</div>
+                                          <div class="col-2">{{calculations.currentAmount | number : '1.2-2'}}</div>
+                                          <div class="col-2">{{calculations.futureAmount | number : '1.2-2'}}</div>
+                                          <div class="col-2">{{calculations.interestRate}}</div>
+                                          <div class="col-2">{{calculations.dateCreated | date:'shortDate'}}</div>
+                                        </div>
+                                      </ng-container>
+                                    </div>
+                                  </div>
+                                  <!-- History Accordion -->
+                                  <div class="row" *ngIf="record.historyRecords.length > 0">
+                                    <h6 class="pt-4">Previous Records</h6>
+                                  </div>
+                                  <div class="row" *ngIf="record.historyRecords.length > 0">
+                                    <div class="col-2">Amount</div> 
+                                    <div class="col-2">LBIR</div>
+                                    <div class="col-2">UBIR</div> 
+                                    <div class="col-2">IR</div> 
+                                    <div class="col-2">Years</div> 
+                                    <div class="col-2">Date</div>
+                                  </div>
+                                  <div class="row">
+                                    <div class="col-12">
+                                      <div class="accordion accordion-borderless" id="accordionFlushHistory">
+                                        <ng-container *ngFor="let historyRecord of record.historyRecords">
+                                          <div class="accordion-item">
+                                            <h2 class="accordion-header" attr.id="flush-heading-history-{{historyRecord.id}}-{{historyRecord.dateCreated | date:'MM-dd-YYYY'}}-{{historyRecord.dateCreated | date:'h-mm-a'}}">
+                                              <button class="accordion-button collapsed" type="button" data-mdb-toggle="collapse"
+                                              attr.data-mdb-target="#flush-collapse-history-{{historyRecord.id}}-{{historyRecord.dateCreated | date:'MM-dd-YYYY'}}-{{historyRecord.dateCreated | date:'h-mm-a'}}" aria-expanded="false" attr.aria-controls="flush-collapse-history-{{historyRecord.id}}-{{historyRecord.dateCreated | date:'MM-dd-YYYY'}}-{{historyRecord.dateCreated | date:'h-mm-a'}}">
+                                                <!-- History Record -->
+                                                <div class="col-2">{{historyRecord.amount | number : '1.2-2'}}</div> 
+                                                <div class="col-2">{{historyRecord.lowerBoundInterestRate}}</div>
+                                                <div class="col-2 items-alignment">{{historyRecord.upperBoundInterestRate}}</div> 
+                                                <div class="col-2 previous-interest-rate-label">{{historyRecord.incrementalRate}}</div> 
+                                                <div class="col-2 year-value">{{historyRecord.maturityYears}}</div> 
+                                                <div class="col-2 items-alignment">{{historyRecord.dateCreated | date:'shortDate'}}</div>
+                                              </button>
+                                            </h2>
+                                            <div attr.id="flush-collapse-history-{{historyRecord.id}}-{{historyRecord.dateCreated | date:'MM-dd-YYYY'}}-{{historyRecord.dateCreated | date:'h-mm-a'}}" class="accordion-collapse collapse" attr.attr.aria-labelledby="flush-heading-history-{{historyRecord.id}}-{{historyRecord.dateCreated | date:'MM-dd-YYYY'}}-{{historyRecord.dateCreated | date:'h-mm-a'}}"
+                                              data-mdb-parent="#accordionFlushHistory">
+                                              <div class="accordion-body card">
+                                                <div *ngIf="historyRecord.historyCalculatedRecords == undefined">
+                                                  No calculated record for history found
+                                                </div>
+                                                <div *ngIf="historyRecord.historyCalculatedRecords != undefined">
+                                                  <div class="row pb-1">
+                                                    <div class="col-2">Year</div> 
+                                                    <div class="col-2">Amount</div>
+                                                    <div class="col-2">Future Amount</div> 
+                                                    <div class="col-2">IR</div> 
+                                                    <div class="col-4">Date</div>
+                                                  </div>
+                                                  <div *ngFor="let historicalCalculation of historyRecord.historyCalculatedRecords">
+                                                    <div class="row">
+                                                      <div class="col-2">{{historicalCalculation.years}}</div> 
+                                                      <div class="col-2">{{historicalCalculation.currentAmount | number : '1.2-2'}}</div>
+                                                      <div class="col-2">{{historicalCalculation.futureAmount | number : '1.2-2'}}</div> 
+                                                      <div class="col-2 interest-rate-value">{{historicalCalculation.interestRate}}</div> 
+                                                      <div class="col-4">{{historicalCalculation.dateCreated | date:'shortDate'}}</div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </ng-container>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-container>
+                        </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,7 @@ namespace FirstCodingExam.Dto
     {
         public int? Id { get; set; }
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
         [Required]
         public double? Amount { get; set; }
 

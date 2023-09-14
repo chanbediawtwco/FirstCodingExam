@@ -18,6 +18,8 @@ public partial class FirstCodingExamDbContext : DbContext
 
     public virtual DbSet<CalculatedRecord> CalculatedRecords { get; set; }
 
+    public virtual DbSet<HistoryCalculatedRecord> HistoryCalculatedRecords { get; set; }
+
     public virtual DbSet<HistoryRecord> HistoryRecords { get; set; }
 
     public virtual DbSet<Record> Records { get; set; }
@@ -28,49 +30,59 @@ public partial class FirstCodingExamDbContext : DbContext
     {
         modelBuilder.Entity<CalculatedRecord>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Calculat__3214EC07621018E9");
+            entity.HasKey(e => e.Id).HasName("PK__Calculat__3214EC07EDD31AB7");
 
             entity.Property(e => e.DateCreated).HasColumnType("datetime");
 
             entity.HasOne(d => d.Record).WithMany(p => p.CalculatedRecords)
                 .HasForeignKey(d => d.RecordId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Calculate__Recor__607251E5");
+                .HasConstraintName("FK__Calculate__Recor__5F7E2DAC");
+        });
+
+        modelBuilder.Entity<HistoryCalculatedRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__HistoryC__3214EC0763A903C3");
+
+            entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+            entity.HasOne(d => d.HistoryRecord).WithMany(p => p.HistoryCalculatedRecords)
+                .HasForeignKey(d => d.HistoryRecordId)
+                .HasConstraintName("FK__HistoryCa__Histo__662B2B3B");
         });
 
         modelBuilder.Entity<HistoryRecord>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__HistoryR__3214EC07B0B97A7A");
+            entity.HasKey(e => e.Id).HasName("PK__HistoryR__3214EC0781ED694A");
 
             entity.Property(e => e.DateCreated).HasColumnType("datetime");
 
             entity.HasOne(d => d.Record).WithMany(p => p.HistoryRecords)
                 .HasForeignKey(d => d.RecordId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__HistoryRe__Recor__634EBE90");
+                .HasConstraintName("FK__HistoryRe__Recor__625A9A57");
 
             entity.HasOne(d => d.User).WithMany(p => p.HistoryRecords)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__HistoryRe__UserI__6442E2C9");
+                .HasConstraintName("FK__HistoryRe__UserI__634EBE90");
         });
 
         modelBuilder.Entity<Record>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Records__3214EC0706AD3366");
+            entity.HasKey(e => e.Id).HasName("PK__Records__3214EC077CEE0D8D");
 
             entity.Property(e => e.DateCreated).HasColumnType("datetime");
-            entity.Property(e => e.IsDeleted).HasDefaultValueSql("((0))");
 
             entity.HasOne(d => d.User).WithMany(p => p.Records)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Records__UserId__5CA1C101");
+                .HasConstraintName("FK__Records__UserId__5BAD9CC8");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07078D14AC");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07823E1ACF");
 
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.Firstname).HasMaxLength(255);

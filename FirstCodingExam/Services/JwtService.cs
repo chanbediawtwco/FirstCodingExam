@@ -37,7 +37,7 @@ namespace FirstCodingExam.Services
                 _configuration[Constants.JwtIssuer],
                 _configuration[Constants.JwtAudience],
                 Claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddHours(1),
                 signingCredentials: Credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

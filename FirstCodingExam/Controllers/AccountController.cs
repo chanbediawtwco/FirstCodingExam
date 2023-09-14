@@ -36,7 +36,11 @@ namespace FirstCodingExam.Controllers
             var DbUser = _accountService.GetUserProfile(UserLogin.Email, UserLogin.Password, _context);
             if (DbUser != null)
             {
-                return Ok(await _jwtService.GenerateToken(DbUser, _context));
+                ResponseToken Token = new ResponseToken
+                {
+                    Token = await _jwtService.GenerateToken(DbUser, _context)
+                };
+                return Ok(Token);
             }
 
             return NotFound();

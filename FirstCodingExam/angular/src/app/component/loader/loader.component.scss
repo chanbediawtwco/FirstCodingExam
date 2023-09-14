@@ -1,0 +1,33 @@
+// Loader
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+}
+
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+.loader {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: inline-block;
+    border-top: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+    box-sizing: border-box;
+    animation: loader 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    color: rgb(25, 25, 25);
+    border-color: currentColor transparent transparent transparent;
+}
+@keyframes loader {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+}

@@ -23,6 +23,8 @@ public partial class HistoryRecord
 
     public DateTime DateCreated { get; set; }
 
+    public virtual ICollection<HistoryCalculatedRecord> HistoryCalculatedRecords { get; set; } = new List<HistoryCalculatedRecord>();
+
     public virtual Record Record { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
