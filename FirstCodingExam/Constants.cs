@@ -16,6 +16,6 @@
 
         // Http context accessor
         public const string Authorization = "Authorization";
-        public const string Bearer = "bearer ";
+        public const string Bearer = "Bearer ";
     }
 }

@@ -23,6 +23,18 @@ namespace FirstCodingExam.Mapping
             CreateMap<Record, HistoryRecord>()
                 .ForMember(Record => Record.RecordId,
                 Option => Option.MapFrom(HistoryRecord => HistoryRecord.Id));
+            //Error when there is a missing column below
+            CreateMap<CalculatedRecord, HistoryCalculatedRecord>()
+                .ForMember(HistoryCalculatedRecord => HistoryCalculatedRecord.Years,
+                Option => Option.MapFrom(CalculatedRecord => CalculatedRecord.Years))
+                .ForMember(HistoryCalculatedRecord => HistoryCalculatedRecord.CurrentAmount,
+                Option => Option.MapFrom(CalculatedRecord => CalculatedRecord.CurrentAmount))
+                .ForMember(HistoryCalculatedRecord => HistoryCalculatedRecord.InterestRate,
+                Option => Option.MapFrom(CalculatedRecord => CalculatedRecord.InterestRate))
+                .ForMember(HistoryCalculatedRecord => HistoryCalculatedRecord.FutureAmount,
+                Option => Option.MapFrom(CalculatedRecord => CalculatedRecord.FutureAmount))
+                .ForMember(HistoryCalculatedRecord => HistoryCalculatedRecord.DateCreated,
+                Option => Option.MapFrom(CalculatedRecord => CalculatedRecord.DateCreated));
         }
     }
 }

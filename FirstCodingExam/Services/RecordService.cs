@@ -14,15 +14,19 @@ namespace FirstCodingExam.Services
         {
             _mapper = mapper;
         }
-        public Record? GetRecordByRecordIdAndUserId(NewRecord UpdatedRecord, FirstCodingExamDbContext _context)
-            => _context.Records.Where(Record => Record.UserId == UpdatedRecord.UserId && Record.Id == UpdatedRecord.Id)
+        public Record? GetRecordByRecordIdAndUserId(int? UserId, int? RecordId, FirstCodingExamDbContext _context)
+            => _context.Records.Where(Record => Record.UserId == UserId && Record.Id == RecordId)
+            .Include(Record => Record.CalculatedRecords
+                .Where(x => x.DateCreated == x.Record.DateCreated && x.RecordId == x.Record.Id))
             .FirstOrDefault();
 
-        public List<Record> GetRecords(int Id, FirstCodingExamDbContext _context)
+        public List<Record> GetRecordsWithHistory(int Id, FirstCodingExamDbContext _context)
             => _context.Records.Where(Record => Record.UserId == Id && !Record.IsDeleted)
             .Include(Record => Record.CalculatedRecords
-                .Where(x => x.DateCreated == x.Record.DateCreated))
-            .Include(x => x.HistoryRecords)
+                .Where(CalculatedRecords => CalculatedRecords.DateCreated == CalculatedRecords.Record.DateCreated 
+                && CalculatedRecords.RecordId == CalculatedRecords.Record.Id))
+            .Include(Record => Record.HistoryRecords)
+                .ThenInclude(HistoryRecords => HistoryRecords.HistoryCalculatedRecords)
             .ToList();
 
         public bool IsValidRecordInput(NewRecord NewRecord)
@@ -40,12 +44,33 @@ namespace FirstCodingExam.Services
                     || DbRecord.IncrementalRate != UpdatedRecord.IncrementalRate
                     || DbRecord.MaturityYears != UpdatedRecord.MaturityYears;
 
-        public void SavePreviousRecordToHistoryRecordTable(Record CurrentRecord, FirstCodingExamDbContext _context)
+        public void SavePreviousRecordToHistory(Record CurrentRecord, FirstCodingExamDbContext _context)
+        {
+            SavePreviousRecord(CurrentRecord, _context, out int NewHistoryRecordId);
+            SavePreviouscalculation(CurrentRecord, _context, NewHistoryRecordId);
+        }
+        private void SavePreviousRecord(Record CurrentRecord, FirstCodingExamDbContext _context, out int NewHistoryRecordId)
         {
             HistoryRecord NewHistoryRecord = _mapper.Map<HistoryRecord>(CurrentRecord);
-            // Manually unset Id for historical record as Ignore or DoNotValidate not working on mapping
+            // Manually unset Id before inserting to database for historical record as Ignore or DoNotValidate not working on mapping
+            // There will be an error on saving if there is an ID
             NewHistoryRecord.Id = 0;
             _context.HistoryRecords.Add(NewHistoryRecord);
+            _context.SaveChanges();
+            _context.ChangeTracker.DetectChanges();
+            NewHistoryRecordId = NewHistoryRecord.Id;
+        }
+        private void SavePreviouscalculation(Record CurrentRecord, FirstCodingExamDbContext _context, int NewHistoryRecordId)
+        {
+            foreach (var CalculatedRecord in CurrentRecord.CalculatedRecords)
+            {
+                HistoryCalculatedRecord calculatedRecord = _mapper.Map<HistoryCalculatedRecord>(CalculatedRecord);
+                // Manually unset Id before inserting to database for historical record as Ignore or DoNotValidate not working on mapping
+                // There will be an error on saving if there is an ID
+                calculatedRecord.Id = 0;
+                calculatedRecord.HistoryRecordId = NewHistoryRecordId;
+                _context.HistoryCalculatedRecords.Add(calculatedRecord);
+            }
             _context.SaveChanges();
             _context.ChangeTracker.DetectChanges();
         }
@@ -61,7 +86,7 @@ namespace FirstCodingExam.Services
         private void SaveNewRecord(NewRecord NewRecord, FirstCodingExamDbContext _context, DateTime DateTimeStamp, out int RecordId)
         {
             Record Record = _mapper.Map<Record>(NewRecord);
-            Record.UserId = NewRecord.UserId;
+            Record.UserId = Convert.ToInt32(NewRecord.UserId);
             Record.DateCreated = DateTimeStamp;
             _context.Records.Add(Record);
             _context.SaveChanges();
@@ -72,7 +97,8 @@ namespace FirstCodingExam.Services
         private void GenerateCalculationList(int RecordId, NewRecord NewRecord, FirstCodingExamDbContext _context, DateTime DateTimeStamp)
         {
             // Calculate the new record and save it to calculated record table
-            var InterestRate = Convert.ToInt32(NewRecord.LowerBoundInterestRate);
+            // If the lower bound is higher than upper bound we will use higher bound as deafult interest rate
+            var InterestRate = Convert.ToInt32(NewRecord.LowerBoundInterestRate < NewRecord.UpperBoundInterestRate ? NewRecord.LowerBoundInterestRate : NewRecord.UpperBoundInterestRate);
             var UpperBoundInterestRate = Convert.ToInt32(NewRecord.UpperBoundInterestRate);
             var Amount = Convert.ToDouble(NewRecord.Amount);
             // Loop to maturity year to calculate the interest per year
@@ -136,26 +162,6 @@ namespace FirstCodingExam.Services
             CurrentRecord.DateCreated = DateTimeStamp;
             _context.SaveChanges();
             _context.ChangeTracker.DetectChanges();
-        }
-
-        public Record GetCalculatedRecordForHistory(int UserId, int RecordId, DateTime DateCreated, FirstCodingExamDbContext _context)
-        {
-            var CalculatedRecords = _context.CalculatedRecords
-                .Where(CalculatedRecord => CalculatedRecord.RecordId == RecordId
-                && CalculatedRecord.DateCreated == DateCreated)
-                .ToList();
-
-            var HistoryRecord = _context.HistoryRecords
-                .Where(HistoryRecord => HistoryRecord.RecordId == RecordId
-                    && HistoryRecord.DateCreated == DateCreated
-                    && HistoryRecord.UserId == UserId)
-                .FirstOrDefault();
-
-            // Map to Record model to easily pass at as one object to front end
-            // This includes History with Calculated Values
-            Record Record = _mapper.Map<Record>(HistoryRecord);
-            Record.CalculatedRecords = CalculatedRecords;
-            return Record;
         }
     }
 

@@ -1,0 +1,107 @@
+<div class="modal-body" *ngIf="!isLoading">
+    <div class="loginlbl">
+        Register
+    </div>
+    <div class="alert alert-danger" *ngIf="hasError" role="alert">
+        {{errorMessage}}
+    </div>
+    <div class="container">
+        <div class="form">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group" 
+                    [class.has-error]="email.invalid && email.touched"
+                    [class.has-success]="email.valid">
+                        <label for="#Email" 
+                        class="{{userRegistration.email == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                            Email
+                        </label>
+                        <input class="form-control"
+                        [(ngModel)]="userRegistration.email" type="email" 
+                        placeholder="Email" 
+                        #email="ngModel" required email>
+                        <div class="alert alert-danger" 
+                        *ngIf="email.errors?.['required'] && email.touched" role="alert">
+                            Email is required
+                        </div>
+                        <div class="alert alert-danger" 
+                        *ngIf="email.errors?.['email'] && email.touched" role="alert">
+                            Email is invalid
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group" 
+                    [class.has-error]="firstname.invalid && firstname.touched"
+                    [class.has-success]="firstname.valid">
+                        <label for="#Firstname" 
+                        class="{{userRegistration.firstname == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                            Firstname
+                        </label>
+                        <input class="form-control"
+                        [(ngModel)]="userRegistration.firstname" type="text" 
+                        placeholder="Firstname" 
+                        #firstname="ngModel" required>
+                        <div class="alert alert-danger" 
+                        *ngIf="firstname.invalid && firstname.touched" role="alert">
+                            Firstname is required
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group" 
+                    [class.has-error]="lastname.invalid && lastname.touched"
+                    [class.has-success]="lastname.valid">
+                        <label for="#Lastname" 
+                        class="{{userRegistration.lastname == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                            Lastname
+                        </label>
+                        <input class="form-control"
+                        [(ngModel)]="userRegistration.lastname" type="text" 
+                        placeholder="Lastname" 
+                        #lastname="ngModel" required>
+                        <div class="alert alert-danger" 
+                        *ngIf="lastname.invalid && lastname.touched" role="alert">
+                            Lastname is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group"
+                    [class.has-error]="password.invalid && password.touched"
+                    [class.has-success]="password.valid">
+                        <label for="#Password" 
+                        class="{{userRegistration.password == '' ? 'js-hide-label' : 'js-unhide-label'}}">
+                            Password
+                        </label>
+                        <input class="form-control"
+                        [(ngModel)]="userRegistration.password" type="password" 
+                        placeholder="Password" 
+                        #password="ngModel" required password>
+                        <div class="alert alert-danger" 
+                        *ngIf="password.invalid && password.touched" role="alert">
+                            Password is required
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="container">
+                    <div class="row justify-content-around">
+                        <button type="button" class="btn btn-outline-success col-sm-2" (click)="register()">Register</button>
+                        <button type="button" class="btn btn-outline-danger col-sm-2" (click)="activeModal.dismiss('Close dismiss')">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="animate" *ngIf="isLoading">
+    <div class="loader-container">
+        <span class="loader"></span>
+    </div>
+</div>

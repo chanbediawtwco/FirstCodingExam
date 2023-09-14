@@ -1,0 +1,57 @@
+.btn {
+    margin: 10px;
+}
+
+.delete-button, .edit-button {
+    border: 0;
+}
+
+.legends {
+    background-color: #ebebeb;
+    padding: 20px;
+    border-radius: 20px;
+    color: #5b5b5b;
+    font-family: system-ui;
+    translate: 55%;
+    z-index: -1;
+}
+
+.accordion-borderless .accordion-item .accordion-button:not(.collapsed) {
+    color: #000000;
+    box-shadow: none;
+    border-bottom-left-radius: unset;
+    border-bottom-right-radius: unset;
+}
+
+.accordion-item:hover{
+    background-color: var(--mdb-accordion-borderless-btn-bg);
+}
+
+.accordion-item {
+    background-color: white;
+}
+
+.items-alignment {
+    padding-left: 23px;
+}
+
+.id-label {
+    padding-left: 37px;
+}
+
+.year-value {
+    padding-left: 26px;
+}
+
+.interest-rate-value, .previous-interest-rate-label {
+    padding-left: 11px;
+}
+
+.records-body {
+    overflow: auto;
+    height: 79vh;
+}
+
+.amount-label {
+    padding-left: 28px
+}

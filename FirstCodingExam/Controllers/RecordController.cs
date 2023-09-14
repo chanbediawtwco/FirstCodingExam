@@ -29,10 +29,10 @@ namespace FirstCodingExam.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         [Route("records")]
-        public IActionResult GetRecordsWithHistory()
+        public IActionResult GetRecords()
         {
             var UserId = _jwtService.GetUserIdFromToken();
-            var Records = _recordService.GetRecords(UserId, _context);
+            var Records = _recordService.GetRecordsWithHistory(UserId, _context);
             if (Records.Count() > 0)
             {
                 return Ok(Records);
@@ -40,24 +40,7 @@ namespace FirstCodingExam.Controllers
             return NoContent();
         }
 
-        // Get: RecordController/record/getallrecords
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet]
-        [Route("record/calculated-history/{recordid}/{datecreated}")]
-        public IActionResult GetHistoryCalculatedRecords(int RecordId, DateTime DateCreated)
-        {
-            var UserId = _jwtService.GetUserIdFromToken();
-
-            var Record = _recordService.GetCalculatedRecordForHistory(UserId, RecordId, DateCreated, _context);
-            
-            if (Record != null )
-            {
-                return Ok(Record);
-            }
-            return NoContent();
-        }
-
-        // Post: RecordController/record/saverecord
+        // Post: RecordController/record/save
         [Authorize]
         [HttpPost]
         [Route("record/save")]
@@ -84,15 +67,15 @@ namespace FirstCodingExam.Controllers
                 return BadRequest();
             }
 
-            UpdateRecord.UserId = _jwtService.GetUserIdFromToken();
-            var DbRecord = _recordService.GetRecordByRecordIdAndUserId(UpdateRecord, _context);
+            int UserId = _jwtService.GetUserIdFromToken();
+            var DbRecord = _recordService.GetRecordByRecordIdAndUserId(UserId, UpdateRecord.Id, _context);
             bool IsRecordExisting = DbRecord != null;
             if (IsRecordExisting)
             {
                 var HasChanges = _recordService.HasChanges(UpdateRecord, DbRecord);
                 if (HasChanges)
                 {
-                    _recordService.SavePreviousRecordToHistoryRecordTable(DbRecord, _context);
+                    _recordService.SavePreviousRecordToHistory(DbRecord, _context);
                     _recordService.UpdateAndCalculateRecord(DbRecord, UpdateRecord, _context);
                     return NoContent();
                 }
@@ -108,11 +91,11 @@ namespace FirstCodingExam.Controllers
         // Delete: RecordController/record/updaterecord
         [Authorize]
         [HttpDelete]
-        [Route("record/delete")]
-        public IActionResult DeleteRecord([FromBody] NewRecord DeleteRecord)
+        [Route("record/delete/{recordid}")]
+        public IActionResult DeleteRecord(int? RecordId)
         {
-            DeleteRecord.UserId = _jwtService.GetUserIdFromToken();
-            var DbRecord = _recordService.GetRecordByRecordIdAndUserId(DeleteRecord, _context);
+            int UserId = _jwtService.GetUserIdFromToken();
+            var DbRecord = _recordService.GetRecordByRecordIdAndUserId(UserId, RecordId, _context);
             bool IsRecordExisting = DbRecord != null;
             if (IsRecordExisting)
             {
