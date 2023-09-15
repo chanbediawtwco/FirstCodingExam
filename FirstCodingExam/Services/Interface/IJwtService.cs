@@ -5,7 +5,7 @@ namespace FirstCodingExam.Services.Interface
 {
     public interface IJwtService
     {
-        public Task<string> GenerateToken(User User, FirstCodingExamDbContext _context);
+        public Task<string> GenerateToken(User User);
         public int GetUserIdFromToken();
     }
 }
