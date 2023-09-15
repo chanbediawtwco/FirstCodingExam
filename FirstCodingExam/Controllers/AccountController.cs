@@ -38,7 +38,7 @@ namespace FirstCodingExam.Controllers
             {
                 ResponseToken Token = new ResponseToken
                 {
-                    Token = await _jwtService.GenerateToken(DbUser, _context)
+                    Token = await _jwtService.GenerateToken(DbUser)
                 };
                 return Ok(Token);
             }

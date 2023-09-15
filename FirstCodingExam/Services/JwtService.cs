@@ -18,7 +18,7 @@ namespace FirstCodingExam.Services
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<string> GenerateToken(User User, FirstCodingExamDbContext _context)
+        public async Task<string> GenerateToken(User User)
         {
             // Generate Keys
             var SecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration[Constants.JwtKey]));
