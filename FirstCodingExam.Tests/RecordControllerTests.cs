@@ -123,6 +123,13 @@ namespace FirstCodingExam.Tests
         public async Task SaveRecord_WithValidRecord_ReturnsStatusCode201()
         {
             // Arrange
+            var userId = 0; // The user ID to be used in the test
+            var email = "test@wtwco.com";
+            User UserLogin = new User
+            {
+                Id = userId,
+                Email = email
+            };
             var jwtServiceMock = new Mock<IJwtService>();
             jwtServiceMock.Setup(service => service.GetUserIdFromToken()).Returns(1);
 
@@ -146,7 +153,8 @@ namespace FirstCodingExam.Tests
 
             var httpContext = new DefaultHttpContext();
             httpContext.User = claimsPrincipal;
-            httpContext.Request.Headers.Add("Authorization", new StringValues($"Bearer {CreateJwtToken()}"));
+            var jwtToken = CreateJwtToken(UserLogin); // Create a JWT token with the user's ID
+            httpContext.Request.Headers.Add("Authorization", new StringValues($"Bearer {CreateJwtToken(UserLogin)}"));
 
             controller.ControllerContext = new ControllerContext
             {
@@ -171,15 +179,5 @@ namespace FirstCodingExam.Tests
             var statusCodeResult = (StatusCodeResult)result;
             Assert.Equal(StatusCodes.Status201Created, statusCodeResult.StatusCode);
         }
-
-        private string CreateJwtToken()
-        {
-            // Implement your JWT token creation logic here for testing purposes
-            // You can create a valid JWT token with the required claims for authentication
-            // Return the JWT token as a string
-            return "your-jwt-token";
-        }
-
-        // Similar tests for UpdateRecord and DeleteRecord can be added as needed.
     }
 }

@@ -59,6 +59,42 @@ namespace FirstCodingExam.Tests
         }
 
         [Fact]
+        public async Task Login_ValidUser_ReturnsOkResult()
+        {
+            // Arrange
+            var mockAccountService = new Mock<IAccountService>();
+            var mockContext = new Mock<FirstCodingExamDbContext>();
+            var mockJwtService = new Mock<IJwtService>();
+
+            var controller = new AccountController(mockAccountService.Object, mockContext.Object, mockJwtService.Object);
+            var userLogin = new Login 
+            { 
+                Email = "christhian.bedia@wtwco.com", 
+                Password = "christhianBedia" 
+            };
+
+            // Set up mock behavior for IsValidUserInformation method
+            mockAccountService.Setup(service => service.IsValidUserInformation(userLogin)).Returns(true);
+
+            User user = new User();
+            // Set up mock behavior for GetUserProfile method
+            mockAccountService.Setup(service => service.GetUserProfile(userLogin.Email, userLogin.Password, mockContext.Object))
+                .Returns(user);
+
+            // Set up mock behavior for GenerateToken method
+            mockJwtService.Setup(service => service.GenerateToken(It.IsAny<User>()))
+                .ReturnsAsync("testToken");
+
+            // Act
+            var result = await controller.Login(userLogin);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var responseToken = Assert.IsType<ResponseToken>(okResult.Value);
+            Assert.Equal("testToken", responseToken.Token);
+        }
+
+        [Fact]
         public async Task Login_WithInvalidUser_ReturnsBadRequestResult()
         {
             // Arrange
@@ -163,6 +199,36 @@ namespace FirstCodingExam.Tests
             Assert.IsType<BadRequestResult>(result);
         }
 
+        // Test for the Registration method when a user already exists
+        [Fact]
+        public void Registration_ExistingUser_ReturnsConflict()
+        {
+            // Arrange
+            var existingUserRegistration = new UserRegistration
+            {
+                Email = "christhian.bedia@wtwco.com",
+                Password = "christhianBedia"
+            };
 
+            var mockAccountService = new Mock<IAccountService>();
+            var mockContext = new Mock<FirstCodingExamDbContext>();
+            var mockJwtService = new Mock<IJwtService>();
+
+            var controller = new AccountController(mockAccountService.Object, mockContext.Object, mockJwtService.Object);
+
+            // Set up mock behavior for IsValidUserInformation method
+            mockAccountService.Setup(service => service.IsValidUserInformation(existingUserRegistration)).Returns(true);
+
+            User user = new User();
+            // Set up mock behavior for GetUserProfile method (returning an existing user)
+            mockAccountService.Setup(service => service.GetUserProfile(existingUserRegistration.Email, existingUserRegistration.Password, mockContext.Object))
+                .Returns(user);
+
+            // Act
+            var result = controller.Registration(existingUserRegistration);
+
+            // Assert
+            Assert.IsType<ConflictResult>(result);
+        }
     }
 }
